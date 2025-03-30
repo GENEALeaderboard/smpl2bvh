@@ -1,8 +1,6 @@
 # Smpl2bvh for GENEA Leaderboard and BEAT2 dataset
 The instructions below guarantee sucessful conversion of [**BEAT2 dataset**](https://paperswithcode.com/dataset/beat2) `.npz` files to `.bvh` files for visualization inside [**BVHView**](https://github.com/TeoNikolov/BVHView/), both supporting the efforts of the [**GENEA Leaderboard**](https://genea-workshop.github.io/leaderboard/).
 
-When using the 
-
 ## Setup
 Follow these instructions to setup smpl2bvh:
 
