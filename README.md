@@ -1,3 +1,34 @@
+# Smpl2bvh for GENEA Leaderboard and BEAT2 dataset
+The instructions below guarantee sucessful conversion of [**BEAT2 dataset**](https://paperswithcode.com/dataset/beat2) `.npz` files to `.bvh` files for visualization inside [**BVHView**](https://github.com/TeoNikolov/BVHView/), both supporting the efforts of the [**GENEA Leaderboard**](https://genea-workshop.github.io/leaderboard/).
+
+When using the 
+
+## Setup
+Follow these instructions to setup smpl2bvh:
+
+1. `git clone https://github.com/TeoNikolov/smpl2bvh.git`
+2. `cd ./smpl2bvh`
+3. `git checkout genea_leaderboard`
+4. `conda create -n smpl2bvh python=3.6`
+5. `conda activate smpl2bvh`
+6. `pip install smplx[all] chumpy`
+7. Go to [https://smpl-x.is.tue.mpg.de/login.php](https://smpl-x.is.tue.mpg.de/login.php) >> login / register.
+8. Go to [https://smpl-x.is.tue.mpg.de/download.php](https://smpl-x.is.tue.mpg.de/download.php) >> download `Download SMPL-X v1.1 (NPZ+PKL, 830 MB) - Use this for SMPL-X Python codebase`
+9. Extract `models_smplx_v1_1.zip/models/smplx/*` >> `smpl2bvh/data/smpl/smplx/`
+
+## Usage
+
+To convert BEAT2 dataset `.npz` files to `.bvh` files, run:
+
+    python smpl2bvh.py --poses "<path_to_npz>" --output "<path_to_save_bvh>"
+
+- `--poses` should include `.npz` file extension
+- `--output` should include `.bvh` file extension
+
+---
+
+# --- Original Description Below ---
+
 # smpl2bvh
 This repository contains an example script to convert from a SMPL model to a bvh file.
 
