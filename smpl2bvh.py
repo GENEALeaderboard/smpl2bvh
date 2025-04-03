@@ -78,7 +78,6 @@ def smpl2bvh(model_path:str, poses:str, output:str, mirror:bool,
             "Right_palm",
         ],
         "smplx": [
-            "root",
             "pelvis", # 0, -1
             "left_hip", #1, 0
             "right_hip", #2, 0
@@ -137,28 +136,24 @@ def smpl2bvh(model_path:str, poses:str, output:str, mirror:bool,
         ]
     }
     
-    # I prepared smpl models only, 
-    # but I will release for smplx models recently.
     model = smplx.create(model_path=model_path, 
                         model_type=model_type,
                         gender=gender, 
-                        batch_size=1)
+                        batch_size=1,
+                        flat_hand_mean=True)
     
-    parents = model.parents.detach().cpu().numpy()
-    
-    # You can define betas like this.(default betas are 0 at all.)
-    rest = model(
-        # betas = torch.randn([1, num_betas], dtype=torch.float32)
-    )
-    rest_pose = rest.joints.detach().cpu().numpy().squeeze()
 
+    rest = model()
+    rest_pose = rest.joints.detach().cpu().numpy().squeeze()
     if model_type == "smpl":
         rest_pose = rest_pose[:24,:]
     elif model_type == "smplx":
         rest_pose = rest_pose[:55,:]
     else:
         raise ValueError("This model type is not supported!")
-    
+
+    parents = model.parents.detach().cpu().numpy()
+
     root_offset = rest_pose[0]
     offsets = rest_pose - rest_pose[parents]
     offsets[0] = root_offset
@@ -181,6 +176,7 @@ def smpl2bvh(model_path:str, poses:str, output:str, mirror:bool,
             trans = np.squeeze(poses["trans"], axis=0) # (N, 3)
 
     elif poses.endswith(".pkl"):
+        # This code has not been tested with SMPLX!
         with open(poses, "rb") as f:
             poses = pickle.load(f)
             rots = poses["smpl_poses"] # (N, 72)
@@ -194,19 +190,20 @@ def smpl2bvh(model_path:str, poses:str, output:str, mirror:bool,
     if scaling is not None:
         trans /= scaling
     
+    # Add root bone, as original NPZ and SMPLX model do not have it here (but they do in Blender and BVHView)
+    if model_type == "smplx":
+        names["smplx"] = ["root"] + names["smplx"]
+        parents = np.insert(parents + 1, 0, -1)
+        offsets = np.insert(offsets, 0, 0, axis=0)
+        rots = np.concatenate([np.zeros((rots.shape[0], 1, 3)), rots], axis=1)
+        rots[:,0,:] = 0.00000001
+
     # to quaternion
     rots = quat.from_axis_angle(rots)
-    
     pos = offsets[None].repeat(len(rots), axis=0)
     positions = pos.copy()
     positions[:,0] += trans * 100
     rotations = np.degrees(quat.to_euler(rots, order=order))
-    
-    if model_type == "smplx":
-        offsets = np.concatenate([np.zeros((1, 3)), offsets])
-        positions = np.concatenate([np.zeros((2064, 1, 3)), positions], axis=1)
-        rotations = np.concatenate([np.zeros((2064, 1, 3)), rotations], axis=1)
-        parents = np.insert(parents+1, 0, -1)
 
     bvh_data ={
         "rotations": rotations,
