@@ -4,7 +4,7 @@ The instructions below guarantee sucessful conversion of [**BEAT2 dataset**](htt
 ## Setup
 Follow these instructions to setup smpl2bvh:
 
-1. `git clone https://github.com/TeoNikolov/smpl2bvh.git`
+1. `git clone https://github.com/GENEALeaderboard/smpl2bvh.git`
 2. `cd ./smpl2bvh`
 3. `git checkout genea_leaderboard`
 4. `conda create -n smpl2bvh python=3.6`
