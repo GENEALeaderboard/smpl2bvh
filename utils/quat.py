@@ -256,6 +256,14 @@ def from_angle_axis(angle, axis):
 
 # Calculate quaternions from axis-angle.
 def from_axis_angle(rots):
+    # Replace near-zero angles with small values to prevent division by zero
+    tr = 1e-9
+    angle = np.linalg.norm(rots, axis=-1)
+    angle_near_zero_mask = angle < tr
+    rots = np.array(rots, copy=True)
+    rots[angle_near_zero_mask] = [tr, tr, tr]
+
+    # Extract the axis and angle of rotation
     angle = np.linalg.norm(rots, axis=-1)
     axis = rots / angle[...,None]
     return from_angle_axis(angle, axis)

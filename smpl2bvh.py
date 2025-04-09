@@ -205,6 +205,11 @@ def smpl2bvh(model_path:str, poses:str, output:str, mirror:bool,
     positions[:,0] += trans * 100
     rotations = np.degrees(quat.to_euler(rots, order=order))
 
+    # Check for NaN values before saving to BVH
+    assert not np.isnan(offsets).any(), "NaN values found in 'offsets'. This should be fixed."
+    assert not np.isnan(positions).any(), "NaN values found in 'positions'. This should be fixed."
+    assert not np.isnan(rotations).any(), "NaN values found in 'rotations'. This should be fixed."
+
     bvh_data ={
         "rotations": rotations,
         "positions": positions,
